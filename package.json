@@ -13,17 +13,19 @@
   "keywords": [
     "employee",
     "tracker",
+    "coding",
     "bootcamp",
     "homework",
-    "mySQL",
-    "node",
-    "inquirer"
+    "mysql",
+    "inquirer",
+    "node"
   ],
   "author": "Crystal Ly",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/cml2377/Employee-Tracker/issues"
   },
+=======
   "homepage": "https://github.com/cml2377/Employee-Tracker#readme",
   "dependencies": {
     "inquirer": "^7.0.4",
