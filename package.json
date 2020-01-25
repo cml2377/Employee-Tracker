@@ -1,13 +1,8 @@
 {
   "name": "employee-tracker",
   "version": "1.0.0",
-  "description": "Employee database",
+  "description": "A program that allows you to update an employee database using mySQL and the command line.",
   "main": "index.js",
-  "dependencies": {
-    "inquirer": "^7.0.4",
-    "mysql": "^2.18.1"
-  },
-  "devDependencies": {},
   "scripts": {
     "test": "jest"
   },
@@ -30,5 +25,10 @@
   "bugs": {
     "url": "https://github.com/cml2377/Employee-Tracker/issues"
   },
-  "homepage": "https://github.com/cml2377/Employee-Tracker#readme"
+=======
+  "homepage": "https://github.com/cml2377/Employee-Tracker#readme",
+  "dependencies": {
+    "inquirer": "^7.0.4",
+    "mysql": "^2.18.1"
+  }
 }
