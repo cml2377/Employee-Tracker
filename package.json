@@ -1,0 +1,32 @@
+{
+  "name": "employee-tracker",
+  "version": "1.0.0",
+  "description": "A program that allows you to update an employee database using mySQL and the command line.",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cml2377/Employee-Tracker.git"
+  },
+  "keywords": [
+    "employee",
+    "tracker",
+    "bootcamp",
+    "homework",
+    "mySQL",
+    "node",
+    "inquirer"
+  ],
+  "author": "Crystal Ly",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/cml2377/Employee-Tracker/issues"
+  },
+  "homepage": "https://github.com/cml2377/Employee-Tracker#readme",
+  "dependencies": {
+    "inquirer": "^7.0.4",
+    "mysql": "^2.18.1"
+  }
+}
