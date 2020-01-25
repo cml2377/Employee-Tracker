@@ -40,14 +40,9 @@ CREATE TABLE department
         managerId INT
     );
 
-    SELECT *
-    FROM department;
-    SELECT *
-    FROM role;
-    SELECT *
-    FROM employee;
-
-    -- Hard coding information; the joins will add departmentId, roleId, and managerId. --
+    /* =========================================================
+    Hard coding information; the joins will add departmentId, roleId, and managerId. For now, I need to hard-code the data to test.
+    ========================================================= */
 
     INSERT INTO department
         (deptName)
@@ -60,7 +55,7 @@ CREATE TABLE department
         ("Chemistry");
 
 
-    -- Adding role information. Last value is departmentId. --
+    -- Adding role information. Last value relate to department table. --
     INSERT INTO role
         (title, salary, departmentId)
     VALUES("Microbiologist", 33296.53, 1);
@@ -77,3 +72,10 @@ CREATE TABLE department
     INSERT INTO employee
         (firstName, lastName, roleId, managerId)
     VALUES("Crystal", "Ly", 1, 3);
+
+    SELECT *
+    FROM department;
+    SELECT *
+    FROM role;
+    SELECT *
+    FROM employee;
