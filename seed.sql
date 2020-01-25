@@ -19,6 +19,7 @@ CREATE TABLE department
         id INT NOT NULL PRIMARY KEY,
         title VARCHAR(30),
         salary DECIMAL (7, 2),
+        --Related to department ID in department table--
         departmentId INT
     );
 
@@ -40,4 +41,20 @@ CREATE TABLE department
     SELECT *
     FROM employee;
 
-    
+    INSERT INTO department
+        (deptName)
+    VALUES
+        ("Microbiology");
+
+    INSERT INTO department
+        (deptName)
+    VALUES
+        ("Chemistry");
+
+    INSERT INTO role
+        (title, salary, departmentId)
+    VALUES("Microbiologist", 33296.53, 1);
+
+    INSERT INTO role
+        (title, salary, departmentId)
+    VALUES("Chemist", 34596.53, 2);
