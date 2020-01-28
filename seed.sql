@@ -73,6 +73,22 @@ CREATE TABLE department
         (firstName, lastName, roleId, managerId)
     VALUES("Crystal", "Ly", 1, 3);
 
+    /* Brianna's */
+    SELECT
+        title,
+        salary,
+        first_name,
+        last_name,
+        name
+    FROM
+        employee
+        INNER JOIN
+        roles ON roles.id = employee.role_id
+        INNER JOIN
+        department ON department.id = roles.department_id
+    GROUP BY title, salary, first_name, last_name, name;
+
+
     SELECT *
     FROM department;
     SELECT *
