@@ -35,7 +35,7 @@ function NSAEmployeeTracker() {
                     text = "What did you do?! Now all of China knows you're here!";
                     break;
                 case "View department list":
-                    // Code
+                    // Code 
                     manageDB.viewDept();
                     break;
                 case "View roles":
@@ -45,7 +45,11 @@ function NSAEmployeeTracker() {
                     manageDB.viewEmployees();
                     break;
                 case "Add a department":
-                    manageDB.createDept();
+                    // Make a PROMISE, so I can restart the inquirer questions after createDept/Role/Employee is done.
+                    manageDB.createDept().then(function () {
+                        //restart questions
+                        NSAEmployeeTracker();
+                    });
                     break;
                 case "Add a role":
                     manageDB.createRole();
