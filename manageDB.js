@@ -34,7 +34,7 @@ function viewDept() {
         // Log all results of the SELECT statement
         console.table(res);
         // return back to the prompt.
-
+        return;
     });
 };
 
@@ -63,7 +63,33 @@ function viewEmployees() {
 
 // Add function to create department
 function createDept() {
-    connection.query(``);
+    console.log("Creating a new department...")
+    return inquirer.prompt([
+        {
+            name: "departmentName",
+            type: "input",
+            message: "What is the department name?"
+        },
+        {
+            name: "departmentId",
+            type: "input",
+            message: "What is the department Id?"
+        }
+    ]).then(function (userInput) {
+        connection.query("INSERT INTO department SET ?",
+            {
+                id: userInput.departmentid,
+                deptName: userInput.departmentName,
+            },
+            function (err) {
+                if (err) throw err;
+                // Don't need an else here because if there's an error, the 'throw' will break out of the function.
+                console.log("Your department was created successfully!");
+                // re-prompt the user for if they want to bid or post
+                viewDept();
+            });
+    })
+
 };
 // Add function to create role
 function createRole() {
