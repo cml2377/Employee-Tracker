@@ -1,6 +1,6 @@
 var mysql = require("mysql");
 require("dotenv").config();
-
+const consoleTable = require('console.table');
 
 var connection = mysql.createConnection({
     host: "localhost",
@@ -32,7 +32,7 @@ function viewDept() {
     connection.query("SELECT * FROM department", function (err, res) {
         if (err) throw err;
         // Log all results of the SELECT statement
-        console.log(res);
+        console.table(res);
         // return back to the prompt.
 
     });
@@ -44,7 +44,7 @@ function viewRoles() {
     connection.query("SELECT * FROM role", function (err, res) {
         if (err) throw err;
         // Log all results of the SELECT statement
-        console.log(res);
+        console.table(res);
         // return back to prompt.
     }
     )
@@ -56,7 +56,7 @@ function viewEmployees() {
     connection.query("SELECT * FROM employee", function (err, res) {
         if (err) throw err;
         // Log all results of the SELECT statement
-        console.log(res);
+        console.table(res);
         // return back to prompt
     })
 };
