@@ -93,16 +93,87 @@ function createDept() {
 };
 // Add function to create role
 function createRole() {
-
+    console.log("Creating a new role...")
+    return inquirer.prompt([
+        {
+            name: "roleTitle",
+            type: "input",
+            message: "What is the new role's Title?"
+        },
+        {
+            name: "roleSalary",
+            type: "input",
+            message: "What is the salary for this role?"
+        },
+        {
+            name: "deptId",
+            type: "input",
+            message: "Which department does this role belong to?"
+        }
+    ]).then(function (userInput) {
+        connection.query("INSERT INTO role SET ?",
+            {
+                title: userInput.roleTitle,
+                salary: userInput.roleSalary,
+                departmentId: userInput.deptId
+            },
+            function (err) {
+                if (err) throw err;
+                // Don't need an else here because if there's an error, the 'throw' will break out of the function.
+                console.log("Your role was created successfully!");
+                // re-prompt the user for if they want to bid or post
+                viewRoles();
+            });
+    })
 };
 // Add function to create employee
 function createEmployee() {
-
+    console.log("Creating new employee data...")
+    return inquirer.prompt([
+        {
+            name: "firstName",
+            type: "input",
+            message: "What is the employee's first name?"
+        },
+        {
+            name: "lastName",
+            type: "input",
+            message: "What is the employee's last name?"
+        },
+        {
+            name: "roleId",
+            type: "input",
+            message: "Which role does this employee belong to?"
+        },
+        {
+            name: "managerId",
+            type: "confirm",
+            message: "Does this employee have a manager?"
+        }
+    ]).then(function (userInput) {
+        connection.query("INSERT INTO role SET ?",
+            {
+                firstName: userInput.firstName,
+                lastName: userInput.lastName,
+                roleId: userInput.roleId,
+                // managerId: if true, an employeeId. if false, null.
+            },
+            function (err) {
+                if (err) throw err;
+                // Don't need an else here because if there's an error, the 'throw' will break out of the function.
+                console.log("Your role was created successfully!");
+                // re-prompt the user for if they want to bid or post
+                viewEmployees();
+            });
+    })
 };
+
 // Add function to update employee
 function updateEmployee() {
 
 };
+
+
 // Add function to delete employee
 function removeEmployee() {
 
