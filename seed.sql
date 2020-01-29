@@ -24,20 +24,35 @@ CREATE TABLE department
         -- Employee roles, like Microbiologist, Manager... --
         id INT NOT NULL PRIMARY KEY,
         title VARCHAR(30),
-        salary DECIMAL (7, 2),
-        -- Related to department ID in department table. --
-        departmentId INT
+        salary DECIMAL (10, 2),
+        -- Related to department ID in department table. A foreign key! --
+        departmentId INT,
+        FOREIGN KEY (departmentId)
+        REFERENCES department(id)
+        -- On delete cascade will delete the department all the way down (cascading) the tables that reference that specific dept id. --
+        ON DELETE CASCADE
+        ON UPDATE NO ACTION
     );
 
     CREATE TABLE employee
     (
-        -- Specific employee information, role ID is related to id in role table. --
         id INT PRIMARY KEY,
         firstName VARCHAR(30),
         lastName VARCHAR(30),
+
+        --Foreign keys below--
         roleId INT,
+        FOREIGN KEY (roleId)
+        REFERENCES role(id)
+        ON DELETE CASCADE
+        ON UPDATE NO ACTION,
+
         -- This id is referencing another employee's id; the manager of this particular employee. --
-        managerId INT
+        managerId INT,
+        FOREIGN KEY (managerId)
+        REFERENCES employee(id)
+        ON DELETE CASCADE
+        ON UPDATE NO ACTION
     );
 
     /* ==================================================================================================================================
@@ -70,28 +85,21 @@ CREATE TABLE department
 
     -- Adding employee info. Last 2 values relate to role table. --
     INSERT INTO employee
+        (firstName, lastName)
+    VALUES("Crystal", "Ly");
+
+    INSERT INTO employee
         (firstName, lastName, roleId, managerId)
-    VALUES("Crystal", "Ly", 1, 3);
+    VALUES("Anthony", "Garza");
 
-    /* Brianna's */
-    SELECT
-        title,
-        salary,
-        first_name,
-        last_name,
-        name
-    FROM
-        employee
-        INNER JOIN
-        roles ON roles.id = employee.role_id
-        INNER JOIN
-        department ON department.id = roles.department_id
-    GROUP BY title, salary, first_name, last_name, name;
+    /*================================================================*/
+
+    SELECT employeeDatabase.employee.firstName, employeeDatabase.employee.firstName
+    FROM employeeDatabase.employee INNER JOIN employeeDatabase.role on
+    ;
 
 
     SELECT *
-    FROM department;
-    SELECT *
-    FROM role;
-    SELECT *
-    FROM employee;
+    FROM employee
+    WHERE title="Microbiologist"
+    DESC LIMIT 1;
