@@ -15,7 +15,7 @@ function NSAEmployeeTracker() {
             {
                 type: "list",
                 message: "Welcome to the Employee Database.",
-                name: "username",
+                name: "mainMenu",
                 choices: [
                     "View department list",
                     "View roles",
@@ -30,39 +30,61 @@ function NSAEmployeeTracker() {
         ])
         .then(function (response) {
 
-            switch (response.username) {
+            switch (response.mainMenu) {
                 default:
                     text = "What did you do?! Now all of China knows you're here!";
                     break;
+                //======================================================
                 case "View department list":
-                    // Code 
-                    manageDB.viewDept();
-                    break;
-                case "View roles":
-                    manageDB.viewRoles();
-                    break;
-                case "View employee list":
-                    manageDB.viewEmployees();
-                    break;
-                case "Add a department":
-                    // Make a PROMISE, so I can restart the inquirer questions after createDept/Role/Employee is done.
-                    manageDB.createDept().then(function () {
+                    // Code. Make a PROMISE, so I can restart the inquirer questions AFTER view/update/createDept/Role/Employee is done.
+                    manageDB.viewDept().then(function () {
                         //restart questions
                         NSAEmployeeTracker();
                     });
                     break;
+                //======================================================
+                case "View roles":
+                    manageDB.viewRoles().then(function () {
+                        NSAEmployeeTracker();
+                    });
+                    break;
+                //======================================================
+                case "View employee list":
+                    manageDB.viewEmployees().then(function () {
+                        NSAEmployeeTracker();
+                    });
+                    break;
+                //======================================================
+                case "Add a department":
+                    manageDB.createDept().then(function () {
+                        NSAEmployeeTracker();
+                    });
+                    break;
+                //======================================================
                 case "Add a role":
-                    manageDB.createRole();
+                    manageDB.createRole().then(function () {
+                        NSAEmployeeTracker();
+                    });
                     break;
+                //======================================================
                 case "Add an employee":
-                    manageDB.createEmployee();
+                    manageDB.createEmployee().then(function () {
+                        NSAEmployeeTracker();
+                    });
                     break;
+                //======================================================
                 case "Update employee information":
-                    manageDB.updateEmployee();
+                    manageDB.updateEmployee().then(function () {
+                        NSAEmployeeTracker();
+                    });
                     break;
+                //======================================================
                 case "Remove employee from database":
-                    manageDB.removeEmployee();
+                    manageDB.removeEmployee().then(function () {
+                        NSAEmployeeTracker();
+                    });
                     break;
+                //======================================================
                 case "Exit":
                     console.log("Exiting employee database.")
                     setTimeout(console.log("Returning to the beginning..."), 2000);
