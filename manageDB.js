@@ -42,7 +42,7 @@ viewDept = (doneViewDeptCallback) => {
             // Log all results of the SELECT statement
             console.table(res);
         }
-        doneViewDeptCallback();
+        doneViewDeptCallback(err, res);
     });
 };
 
@@ -55,7 +55,7 @@ viewRoles = (doneViewRolesCallback) => {
         } else {
             console.table(res);
         }
-        doneViewRolesCallback();
+        doneViewRolesCallback(err, res);
     }
     )
 };
@@ -69,7 +69,7 @@ viewEmployees = (doneViewEmployeeCallback) => {
         } else {
             console.table(res);
         }
-        doneViewEmployeeCallback();
+        doneViewEmployeeCallback(err, res);
     })
 };
 
@@ -141,10 +141,7 @@ createRole = (doneCreateRoleCallback) => {
 createEmployee = (doneCreateEmployeeCallback) => {
     console.log("Creating new employee data...")
     connection.query("SELECT * FROM employee", function (err, res) {
-        var managerArray = ["None"]; // This will return all employees... Technically all managers are employees.
-        for (var i = 0; i < res.length; i++) {
-            managerArray.push(res[i].id);
-        }
+        console.table(res);
         inquirer.prompt([
             {
                 name: "firstName",
@@ -163,20 +160,24 @@ createEmployee = (doneCreateEmployeeCallback) => {
             },
             {
                 name: "managerList",
-                type: "list",
-                message: "Does this employee have a manager? If so, select their manager's employee ID. If there is no manager, select None (NULL).",
-                choices: managerArray
+                type: "input",
+                message: "Does this employee have a manager? If so, then input manager's employee ID. If not, press enter"
             }
         ]).then(function (userInput) {
+            var data = {
+                firstName: userInput.firstName,
+                lastName: userInput.lastName,
+                roleId: userInput.roleId
+            }
+            if (userInput.managerId) {
+                data.managerId = userInput.managerList
+            }
             connection.query("INSERT INTO employee SET ?",
-                {
-                    firstName: userInput.firstName,
-                    lastName: userInput.lastName,
-                    roleId: userInput.roleId,
-                    managerId: userInput.managerList
-                },
-                function () {
+                data,
+                function (err, res) {
+                    console.log('error:' + err);
                     console.log(`${userInput.firstName} ${userInput.lastName}'s profile was created successfully!`);
+                    console.log(res);
                     // displays the table of employees.
                     viewEmployees(doneCreateEmployeeCallback);
                 });
@@ -264,21 +265,21 @@ removeRole = (doneRemoveRoleCallback) => {
     // Displays table of roles to reference when deleting roles.
     connection.query("SELECT * FROM role", function (err, res) {
         console.table(res);
+        inquirer.prompt(
+            {
+                name: "removeRole",
+                type: "number",
+                message: "To remove a role from the database, please input the role ID. \n",
+            })
+            .then(function (userInput) {
+                var newId = Number(userInput.removeRole);
+                connection.query("DELETE FROM role WHERE ?", { id: newId }, function (err, res) {
+                    console.log("Role has been purged from the database.");
+                    // Displays table of roles.
+                    viewRoles(doneRemoveRoleCallback);
+                });
+            })
     })
-    inquirer.prompt(
-        {
-            name: "removeRole",
-            type: "number",
-            message: "To remove a role from the database, please input the role ID. \n",
-        })
-        .then(function (userInput) {
-            var newId = Number(userInput.removeRole);
-            connection.query("DELETE FROM role WHERE ?", { id: newId }, function (err, res) {
-                console.log("Role has been purged from the database.");
-                // Displays table of roles.
-                viewRoles(doneRemoveRoleCallback);
-            });
-        })
 };
 
 
@@ -287,22 +288,23 @@ removeEmployee = (doneRemoveEmployeeCallback) => {
     // Provide a table of employees to reference when removing employees.
     connection.query("SELECT * FROM employee", function (err, res) {
         console.table(res);
-    })
-    inquirer.prompt(
-        {
-            name: "removeEmployee",
-            type: "number",
-            message: "To remove an employee from the database, please input their employee ID. \n",
+        inquirer.prompt(
+            {
+                name: "removeEmployee",
+                type: "number",
+                message: "To remove an employee from the database, please input their employee ID. \n",
 
-        })
-        .then(function (userInput) {
-            var newId = Number(userInput.removeEmployee);
-            connection.query("DELETE FROM employee WHERE ?", { id: newId }, function (err, res) {
-                console.log("Employee has been purged from the database.");
-                // Displays table of employees.
-                viewEmployees(doneRemoveEmployeeCallback);
-            });
-        })
+            })
+            .then(function (userInput) {
+                var newId = Number(userInput.removeEmployee);
+                connection.query("DELETE FROM employee WHERE ?", { id: newId }, function (err, res) {
+                    console.log("Employee has been purged from the database.");
+                    // Displays table of employees.
+                    viewEmployees(doneRemoveEmployeeCallback);
+                });
+            })
+    })
+
 };
 
 //====================MAKE=IT=STOP=========================//
