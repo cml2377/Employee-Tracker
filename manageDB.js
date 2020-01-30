@@ -176,7 +176,6 @@ createEmployee = (doneCreateEmployeeCallback) => {
                     managerId: userInput.managerList
                 },
                 function () {
-                    // Don't need an else here because if there's an error, the 'throw' will break out of the function.
                     console.log(`${userInput.firstName} ${userInput.lastName}'s profile was created successfully!`);
                     // displays the table of employees.
                     viewEmployees(doneCreateEmployeeCallback);
@@ -233,19 +232,13 @@ function updateEmployeeManager(doneUpdateEmployeeMCallback) {
     // Must grab everything from employee table.
     connection.query("SELECT * FROM employee", function (err, res) {
         console.table(res);
-        // Use the response to populate choices in prompt.
-        var idArray = [];
-        for (var i = 0; i < res.length; i++) {
-            idArray.push(res[i].id);
-        }
 
         inquirer.prompt(
             [
                 { // Select an employee, then select by column what you want to change. 
                     name: "employeeList",
-                    type: "list",
-                    message: "Please select the id of the employee you want to update.",
-                    choices: idArray
+                    type: "number",
+                    message: "Please input the id of the employee you want to update.",
                 },
                 {
                     name: "employeeUpdateManager",
@@ -316,7 +309,6 @@ removeEmployee = (doneRemoveEmployeeCallback) => {
 afterConnection = () => {
     // Closes connection after the query has finished.
     connection.end();
-    return;
 }
 
 /*==========================================================================

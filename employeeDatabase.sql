@@ -1,7 +1,7 @@
 /* =======================================================
     Welcome to my Employee Tracker Database!
         Based on node.js and uses mySQL to maintain
-        the database.
+        the database. -Crystal
 ======================================================== */
 
 DROP DATABASE IF EXISTS employeeDatabase;
