@@ -1,3 +1,7 @@
+//===================================================================
+//   There are definitely better software options than this below.
+//===================================================================
+
 var mysql = require("mysql");
 require("dotenv").config();
 const consoleTable = require('console.table');
@@ -19,7 +23,8 @@ var connection = mysql.createConnection({
 connection.connect(function (err) {
     if (err) throw err;
     console.log("connected as id " + connection.threadId);
-    // After the connection, you must be able to go through any of the below functions before terminating the connection.
+    // After the connection, you must be able to go through any of the 
+    // below functions before terminating the connection.
 });
 
 //======================================================================
@@ -85,7 +90,7 @@ createDept = () => {
                 if (err) throw err;
                 // Don't need an else here because if there's an error, the 'throw' will break out of the function.
                 console.log(`Department ${userInput.departmentName} was created successfully!`);
-                // re-prompt the user for if they want to bid or post
+                // Displays table of departments.
                 viewDept();
             });
     })
@@ -129,7 +134,7 @@ createRole = () => {
                 if (err) throw err;
                 // Don't need an else here because if there's an error, the 'throw' will break out of the function.
                 console.log(`Role ${userInput.roleTitle} was created successfully!`);
-                // re-prompt the user for if they want to bid or post
+                // displays table of roles
                 viewRoles();
             });
     })
@@ -178,7 +183,7 @@ createEmployee = () => {
                 if (err) throw err;
                 // Don't need an else here because if there's an error, the 'throw' will break out of the function.
                 console.log(`${firstName} ${lastName}'s profile was created successfully!`);
-                // re-prompt the user for if they want to bid or post
+                // displays the table of employees.
                 viewEmployees();
             });
     })
@@ -222,9 +227,33 @@ function updateEmployee(err, res) {
 
 };
 
+// Add function to delete role
+removeRole = () => {
+    // Displays table of roles to reference when deleting roles.
+    connection.query("SELECT * FROM role", function (err, res) {
+        console.table(res);
+    })
+    return inquirer.prompt(
+        {
+            name: "removeRole",
+            type: "input",
+            message: "To remove a role from the database, please input the role ID.",
+
+        })
+        .then(function (res) {
+            var newId = Number(res.removeRole);
+            connection.query("DELETE FROM role WHERE ?" { id: newId }, function (err, res) {
+                console.log("Role has been purged from the database.");
+                // Displays table of roles.
+                viewRoles();
+            });
+        })
+};
+
 
 // Add function to delete employee
 removeEmployee = () => {
+    // Provide a table of employees to reference when removing employees.
     connection.query("SELECT * FROM employee", function (err, res) {
         console.table(res);
     })
@@ -235,10 +264,12 @@ removeEmployee = () => {
             message: "To remove an employee from the database, please input their employee ID.",
 
         })
-        .then(function (answer) {
-            var newId = Number(answer.employeeRemove);
-            connection.query("DELETE FROM employees WHERE ?" { id: newId }, function (err, res) {
-
+        .then(function (res) {
+            var newId = Number(res.removeEmployee);
+            connection.query("DELETE FROM employee WHERE ?" { id: newId }, function (err, res) {
+                console.log("Employee has been purged from the database.");
+                // Displays table of employees.
+                viewEmployees();
             });
         })
 };
@@ -262,6 +293,7 @@ module.exports = {
     "createRole": createRole,
     "createEmployee": createEmployee,
     "updateEmployee": updateEmployee,
+    "removeRole": removeRole,
     "removeEmployee": removeEmployee,
     "afterConnection": afterConnection
 };
