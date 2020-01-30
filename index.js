@@ -1,14 +1,14 @@
 /*==========================================================================
         Welcome to NSA's employee tracker! Just kidding.
 ==========================================================================*/
+const inquirer = require("inquirer");
+const manageDB = require("./manageDB");
 
 // No really.
 function NSAEmployeeTracker() {
 
     // This file prompts the user to add/delete/update employees/departments
     // from the sql database.
-    const inquirer = require("inquirer");
-    const manageDB = require("manageDB");
 
     inquirer
         .prompt([
@@ -37,57 +37,56 @@ function NSAEmployeeTracker() {
                     break;
                 //======================================================
                 case "View department list":
-                    // Code. Make a PROMISE, so I can restart the inquirer questions AFTER view/update/createDept/Role/Employee is done.
-                    manageDB.viewDept().then(function () {
+                    manageDB.viewDept(function () {
                         //restart questions
                         NSAEmployeeTracker();
                     });
                     break;
                 //======================================================
                 case "View roles":
-                    manageDB.viewRoles().then(function () {
+                    manageDB.viewRoles(function () {
                         NSAEmployeeTracker();
                     });
                     break;
                 //======================================================
                 case "View employee list":
-                    manageDB.viewEmployees().then(function () {
+                    manageDB.viewEmployees(function () {
                         NSAEmployeeTracker();
                     });
                     break;
                 //======================================================
                 case "Add a department":
-                    manageDB.createDept().then(function () {
+                    manageDB.createDept(function () {
                         NSAEmployeeTracker();
                     });
                     break;
                 //======================================================
                 case "Add a role":
-                    manageDB.createRole().then(function () {
+                    manageDB.createRole(function () {
                         NSAEmployeeTracker();
                     });
                     break;
                 //======================================================
                 case "Add an employee":
-                    manageDB.createEmployee().then(function () {
+                    manageDB.createEmployee(function () {
                         NSAEmployeeTracker();
                     });
                     break;
                 //======================================================
                 case "Update employee information":
-                    manageDB.updateEmployee().then(function () {
+                    manageDB.updateEmployee(function () {
                         NSAEmployeeTracker();
                     });
                     break;
                 //======================================================
                 case "Remove a role from database":
-                    manageDB.removeRole().then(function () {
+                    manageDB.removeRole(function () {
                         NSAEmployeeTracker();
                     });
                     break;
                 //======================================================
                 case "Remove employee from database":
-                    manageDB.removeEmployee().then(function () {
+                    manageDB.removeEmployee(function () {
                         NSAEmployeeTracker();
                     });
                     break;
