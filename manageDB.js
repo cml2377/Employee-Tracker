@@ -13,7 +13,7 @@ var connection = mysql.createConnection({
 
     // Your password
     password: process.env.DB_PASSWORD,
-    database: "seed"
+    database: "employeeDatabase"
 });
 
 connection.connect(function (err) {
@@ -27,7 +27,7 @@ connection.connect(function (err) {
 //======================================================================
 
 // View department list
-function viewDept() {
+viewDept = () => {
     console.log("Loading departments...\n");
     connection.query("SELECT * FROM department", function (err, res) {
         if (err) throw err;
@@ -39,7 +39,7 @@ function viewDept() {
 };
 
 // View roles
-function viewRoles() {
+viewRoles = () => {
     console.log("Loading all roles...\n");
     connection.query("SELECT * FROM role", function (err, res) {
         if (err) throw err;
@@ -51,7 +51,7 @@ function viewRoles() {
 };
 
 // View employee list
-function viewEmployees() {
+viewEmployees = () => {
     console.log("Loading all employees...\n");
     connection.query("SELECT * FROM employee", function (err, res) {
         if (err) throw err;
@@ -62,8 +62,8 @@ function viewEmployees() {
 };
 
 // Add function to create department
-function createDept() {
-    console.log("Creating a new department...")
+createDept = () => {
+    console.log("Creating a new department...\n")
     return inquirer.prompt([
         {
             name: "departmentName",
@@ -84,7 +84,7 @@ function createDept() {
             function (err) {
                 if (err) throw err;
                 // Don't need an else here because if there's an error, the 'throw' will break out of the function.
-                console.log("Your department was created successfully!");
+                console.log(`Department ${userInput.departmentName} was created successfully!`);
                 // re-prompt the user for if they want to bid or post
                 viewDept();
             });
@@ -92,7 +92,7 @@ function createDept() {
 
 };
 // Add function to create role
-function createRole() {
+createRole = () => {
     console.log("Creating a new role...")
     return inquirer.prompt([
         {
@@ -107,8 +107,16 @@ function createRole() {
         },
         {
             name: "deptId",
-            type: "input",
-            message: "Which department does this role belong to?"
+            type: "list",
+            message: "Which department does this role belong to?",
+            choices: [
+                // Select all from department.
+                connection.query("SELECT * FROM department"), function (err) {
+                    if (err) throw err;
+                    // Do I need to parse the results out?
+                    console.table(res);
+                }
+            ]
         }
     ]).then(function (userInput) {
         connection.query("INSERT INTO role SET ?",
@@ -120,14 +128,14 @@ function createRole() {
             function (err) {
                 if (err) throw err;
                 // Don't need an else here because if there's an error, the 'throw' will break out of the function.
-                console.log("Your role was created successfully!");
+                console.log(`Role ${userInput.roleTitle} was created successfully!`);
                 // re-prompt the user for if they want to bid or post
                 viewRoles();
             });
     })
 };
 // Add function to create employee
-function createEmployee() {
+createEmployee = () => {
     console.log("Creating new employee data...")
     return inquirer.prompt([
         {
@@ -146,9 +154,16 @@ function createEmployee() {
             message: "Which role does this employee belong to?"
         },
         {
-            name: "managerId",
-            type: "confirm",
-            message: "Does this employee have a manager?"
+            name: "managerList",
+            type: "list",
+            message: "Does this employee have a manager? If so, select their manager. If there is no manager, select None (NULL).",
+            choices: [employeeList = () => {
+                var managerArray = []; // This will return all employees... Technically all managers are employees. Might pare it down by WHEN managerId= NULL.
+                for (var i = 0; i < res.length; i++) {
+                    managerArray.push(res[i].firstName + " " + res[i].lastName);
+                }
+                return managerArray;
+            }, "None"]
         }
     ]).then(function (userInput) {
         connection.query("INSERT INTO role SET ?",
@@ -159,9 +174,10 @@ function createEmployee() {
                 // managerId: if true, an employeeId. if false, null.
             },
             function (err) {
+                // no throw, return error?
                 if (err) throw err;
                 // Don't need an else here because if there's an error, the 'throw' will break out of the function.
-                console.log("Your role was created successfully!");
+                console.log(`${firstName} ${lastName}'s profile was created successfully!`);
                 // re-prompt the user for if they want to bid or post
                 viewEmployees();
             });
@@ -169,20 +185,69 @@ function createEmployee() {
 };
 
 // Add function to update employee
-function updateEmployee() {
+function updateEmployee(err, res) {
+    // Must grab everything from employee table.
+    connection.query("SELECT * FROM employee", function (err, res) {
+        console.table(res);
+    })
+    return inquirer.prompt(
+        [
+            { // Select an employee, then select by column what you want to change. 
+                name: "employeeList",
+                type: "list",
+                message: "Please select the employee you want to update.",
+                choices: [
+                    employeeList = () => {
+                        var nameArray = [];
+                        for (var i = 0; i < res.length; i++) {
+                            nameArray.push(res[i].firstName + " " + res[i].lastName);
+                        }
+                        return nameArray;
+                    },
+                ]
+            },
+            {
+                name: "employeeStats",
+                type: "list",
+                message: "Please select which parameter you'd like to update.",
+                choices: [
+
+                ]
+            }
+        ]).then(() => {
+            connection.query({
+
+            });
+        })
 
 };
 
 
 // Add function to delete employee
-function removeEmployee() {
+removeEmployee = () => {
+    connection.query("SELECT * FROM employee", function (err, res) {
+        console.table(res);
+    })
+    return inquirer.prompt(
+        {
+            name: "removeEmployee",
+            type: "input",
+            message: "To remove an employee from the database, please input their employee ID.",
 
+        })
+        .then(function (answer) {
+            var newId = Number(answer.employeeRemove);
+            connection.query("DELETE FROM employees WHERE ?" { id: newId }, function (err, res) {
+
+            });
+        })
 };
 
 
-function afterConnection() {
+afterConnection = () => {
     // Closes connection after the query has finished.
     connection.end();
+    return;
 }
 
 /*==========================================================================
