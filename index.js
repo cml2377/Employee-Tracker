@@ -99,9 +99,10 @@ function NSAEmployeeTracker() {
                     break;
                 //======================================================
                 case "Exit":
-                    console.log("Exiting employee database.")
-                    setTimeout(console.log("Returning to the beginning..."), 2000);
-                    manageDB.afterConnection();
+                    console.log("Exiting employee database.");
+                    manageDB.afterConnection(function () {
+                        process.exit();
+                    });
                     break;
             }
         });
