@@ -6,16 +6,16 @@ USE employeeDatabase;
 INSERT INTO department
     (id, deptName)
 VALUES
-    (100, "Microbiology");
+    (1, "Microbiology");
 
 INSERT INTO department
     (id, deptName)
 VALUES
-    (200, "Chemistry");
+    (2, "Chemistry");
 INSERT INTO department
     (id, deptName)
 VALUES
-    (300, "Physics");
+    (3, "Physics");
 
 -- Adding role information. Last value relates to department table. --
 INSERT INTO role
