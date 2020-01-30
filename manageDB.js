@@ -103,10 +103,6 @@ createDept = (doneCreateDeptCallback) => {
 createRole = (doneCreateRoleCallback) => {
     console.log("Creating a new role...")
     connection.query("SELECT * FROM role", function (err, res) {
-        var departmentList = [];
-        for (var i = 0; i < res.length; i++) {
-            departmentList.push(res[i].id);
-        }
         inquirer.prompt([
             {
                 name: "roleTitle",
@@ -120,9 +116,8 @@ createRole = (doneCreateRoleCallback) => {
             },
             {
                 name: "deptId",
-                type: "list",
+                type: "number",
                 message: "Which department ID does this role belong to?",
-                choices: departmentList
             }
         ]).then(function (userInput) {
             connection.query("INSERT INTO role SET ?",
@@ -281,7 +276,7 @@ removeRole = (doneRemoveRoleCallback) => {
         {
             name: "removeRole",
             type: "number",
-            message: "To remove a role from the database, please input the role ID.",
+            message: "To remove a role from the database, please input the role ID. \n",
         })
         .then(function (userInput) {
             var newId = Number(userInput.removeRole);
