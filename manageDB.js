@@ -102,7 +102,7 @@ createDept = (doneCreateDeptCallback) => {
 // Add function to create role
 createRole = (doneCreateRoleCallback) => {
     console.log("Creating a new role...")
-    connection.query("SELECT * FROM department", function (err, res) {
+    connection.query("SELECT * FROM role", function (err, res) {
         var departmentList = [];
         for (var i = 0; i < res.length; i++) {
             departmentList.push(res[i].id);
@@ -200,14 +200,10 @@ function updateEmployeeRole(doneUpdateEmployeeRCallback) {
         // Use the response to populate choices in prompt.
         var idArray = [];
         var nameArray = [];
-        var roleArray = [];
         for (var i = 0; i < res.length; i++) {
             idArray.push(res[i].id);
             nameArray.push(res[i].firstName + " " + res[i].lastName);
-            roleArray.push(res[i].roleId);
         }
-
-        console.log(idArray);
 
         inquirer.prompt(
             [
@@ -244,13 +240,9 @@ function updateEmployeeManager(doneUpdateEmployeeMCallback) {
         console.table(res);
         // Use the response to populate choices in prompt.
         var idArray = [];
-        var nameArray = []
         for (var i = 0; i < res.length; i++) {
             idArray.push(res[i].id);
-            nameArray.push(res[i].firstName + " " + res[i].lastName);
         }
-
-        console.log(nameArray, idArray);
 
         inquirer.prompt(
             [
@@ -262,9 +254,8 @@ function updateEmployeeManager(doneUpdateEmployeeMCallback) {
                 },
                 {
                     name: "employeeUpdateManager",
-                    type: "list",
+                    type: "number",
                     message: "Please update employee's manager by selecting the manager's employee ID.",
-                    choices: idArray,
                 }
 
             ]).then((userInput) => {
@@ -289,11 +280,11 @@ removeRole = (doneRemoveRoleCallback) => {
     inquirer.prompt(
         {
             name: "removeRole",
-            type: "input",
+            type: "number",
             message: "To remove a role from the database, please input the role ID.",
         })
-        .then(function (res) {
-            var newId = Number(res.removeRole);
+        .then(function (userInput) {
+            var newId = Number(userInput.removeRole);
             connection.query("DELETE FROM role WHERE ?", { id: newId }, function (err, res) {
                 console.log("Role has been purged from the database.");
                 // Displays table of roles.
@@ -312,12 +303,12 @@ removeEmployee = (doneRemoveEmployeeCallback) => {
     inquirer.prompt(
         {
             name: "removeEmployee",
-            type: "input",
-            message: "To remove an employee from the database, please input their employee ID.",
+            type: "number",
+            message: "To remove an employee from the database, please input their employee ID. \n",
 
         })
-        .then(function (res) {
-            var newId = Number(res.removeEmployee);
+        .then(function (userInput) {
+            var newId = Number(userInput.removeEmployee);
             connection.query("DELETE FROM employee WHERE ?", { id: newId }, function (err, res) {
                 console.log("Employee has been purged from the database.");
                 // Displays table of employees.
