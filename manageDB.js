@@ -159,7 +159,7 @@ createEmployee = (doneCreateEmployeeCallback) => {
                 message: "Which role does this employee belong to?"
             },
             {
-                name: "managerList",
+                name: "managerId",
                 type: "input",
                 message: "Does this employee have a manager? If so, then input manager's employee ID. If not, press enter"
             }
@@ -170,7 +170,7 @@ createEmployee = (doneCreateEmployeeCallback) => {
                 roleId: userInput.roleId
             }
             if (userInput.managerId) {
-                data.managerId = userInput.managerList
+                data.managerId = userInput.managerId
             }
             connection.query("INSERT INTO employee SET ?",
                 data,
@@ -193,20 +193,12 @@ function updateEmployeeRole(doneUpdateEmployeeRCallback) {
     connection.query("SELECT * FROM employee", function (err, res) {
         console.table(res);
         // Use the response to populate choices in prompt.
-        var idArray = [];
-        var nameArray = [];
-        for (var i = 0; i < res.length; i++) {
-            idArray.push(res[i].id);
-            nameArray.push(res[i].firstName + " " + res[i].lastName);
-        }
-
         inquirer.prompt(
             [
                 { // Select an employee, then select by column what you want to change. 
                     name: "employeeId",
-                    type: "list",
-                    message: "Please select the id of the employee you want to update.",
-                    choices: idArray
+                    type: "number",
+                    message: "Please input the id of the employee you want to update.",
 
                 },
                 {
@@ -220,8 +212,11 @@ function updateEmployeeRole(doneUpdateEmployeeRCallback) {
                     [
                         { roleId: userInput.employeeUpdateRole },
                         { id: userInput.employeeId }
-                    ],
-                    viewEmployees(doneUpdateEmployeeRCallback));
+                    ], function (err, res) {
+                        console.log('error:' + err);
+                        console.log(res);
+                        viewEmployees(doneUpdateEmployeeRCallback)
+                    });
             })
     })
 };
@@ -244,7 +239,7 @@ function updateEmployeeManager(doneUpdateEmployeeMCallback) {
                 {
                     name: "employeeUpdateManager",
                     type: "number",
-                    message: "Please update employee's manager by selecting the manager's employee ID.",
+                    message: "Please update employee's manager by entering the manager's employee ID.",
                 }
 
             ]).then((userInput) => {
@@ -252,8 +247,13 @@ function updateEmployeeManager(doneUpdateEmployeeMCallback) {
                     [
                         { managerId: userInput.employeeUpdateManager },
                         { id: userInput.employeeList }
-                    ],
-                    viewEmployees(doneUpdateEmployeeMCallback));
+                    ], function (err, res) {
+                        console.log('error:' + err);
+                        console.log(`Employee's manager was updated successfully!`);
+                        console.log(res);
+                        viewEmployees(doneUpdateEmployeeMCallback)
+                    }
+                );
             })
     })
 };
@@ -308,10 +308,11 @@ removeEmployee = (doneRemoveEmployeeCallback) => {
 };
 
 //====================MAKE=IT=STOP=========================//
-afterConnection = () => {
+afterConnection = (exitCallback) => {
     // Closes connection after the query has finished.
     connection.end();
-}
+    exitCallback();
+};
 
 /*==========================================================================
              This creates an object that gets exported.
