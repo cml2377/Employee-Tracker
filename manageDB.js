@@ -4,7 +4,7 @@
 
 var mysql = require("mysql");
 require("dotenv").config();
-// const consoleTable = require('console.table');
+const consoleTable = require('console.table');
 const inquirer = require("inquirer");
 
 var connection = mysql.createConnection({
@@ -89,9 +89,7 @@ createDept = (doneCreateDeptCallback) => {
             {
                 deptName: userInput.departmentName,
             },
-            function (err) {
-                if (err) throw err;
-                // Don't need an else here because if there's an error, the 'throw' will break out of the function.
+            function () {
                 console.log(`Department ${userInput.departmentName} was created successfully!`);
                 // Displays table of departments.
                 // This is NESTED SO MUCH
@@ -104,45 +102,43 @@ createDept = (doneCreateDeptCallback) => {
 // Add function to create role
 createRole = (doneCreateRoleCallback) => {
     console.log("Creating a new role...")
-    inquirer.prompt([
-        {
-            name: "roleTitle",
-            type: "input",
-            message: "What is the new role's Title?"
-        },
-        {
-            name: "roleSalary",
-            type: "input",
-            message: "What is the salary for this role?"
-        },
-        {
-            name: "deptId",
-            type: "list",
-            message: "Which department does this role belong to?",
-            choices: [
-                // Select all from department.
-                connection.query("SELECT * FROM department"), function (err) {
-                    if (err) throw err;
-                    // Do I need to parse the results out?
-                    console.table(res);
-                }
-            ]
+    connection.query("SELECT * FROM department", function (err, res) {
+        var departmentList = [];
+        for (var i = 0; i < res.length; i++) {
+            departmentList.push(res[i].id);
         }
-    ]).then(function (userInput) {
-        connection.query("INSERT INTO role SET ?",
+        inquirer.prompt([
             {
-                title: userInput.roleTitle,
-                salary: userInput.roleSalary,
-                departmentId: userInput.deptId
+                name: "roleTitle",
+                type: "input",
+                message: "What is the new role's Title?"
             },
-            function (err) {
-                if (err) throw err;
-                // Don't need an else here because if there's an error, the 'throw' will break out of the function.
-                console.log(`Role ${userInput.roleTitle} was created successfully!`);
-                // displays table of roles
-                viewRoles(doneCreateRoleCallback);
-            });
+            {
+                name: "roleSalary",
+                type: "input",
+                message: "What is the salary for this role?"
+            },
+            {
+                name: "deptId",
+                type: "list",
+                message: "Which department ID does this role belong to?",
+                choices: departmentList
+            }
+        ]).then(function (userInput) {
+            connection.query("INSERT INTO role SET ?",
+                {
+                    title: userInput.roleTitle,
+                    salary: userInput.roleSalary,
+                    departmentId: userInput.deptId
+                },
+                function () {
+                    console.log(`Role ${userInput.roleTitle} was created successfully!`);
+                    // displays table of roles
+                    viewRoles(doneCreateRoleCallback);
+                });
+        })
     })
+
 };
 
 // Add function to create employee
@@ -152,7 +148,7 @@ createEmployee = (doneCreateEmployeeCallback) => {
     connection.query("SELECT * FROM employee", function (err, res) {
         var managerArray = ["None"]; // This will return all employees... Technically all managers are employees.
         for (var i = 0; i < res.length; i++) {
-            managerArray.push(res[i].firstName + " " + res[i].lastName);
+            managerArray.push(res[i].id);
         }
         inquirer.prompt([
             {
@@ -173,22 +169,20 @@ createEmployee = (doneCreateEmployeeCallback) => {
             {
                 name: "managerList",
                 type: "list",
-                message: "Does this employee have a manager? If so, select their manager. If there is no manager, select None (NULL).",
+                message: "Does this employee have a manager? If so, select their manager's employee ID. If there is no manager, select None (NULL).",
                 choices: managerArray
             }
         ]).then(function (userInput) {
-            connection.query("INSERT INTO role SET ?",
+            connection.query("INSERT INTO employee SET ?",
                 {
                     firstName: userInput.firstName,
                     lastName: userInput.lastName,
                     roleId: userInput.roleId,
-                    // managerId: if true, an employeeId. if false, null.
+                    managerId: userInput.managerList
                 },
-                function (err) {
-                    // no throw, return error?
-                    if (err) throw err;
+                function () {
                     // Don't need an else here because if there's an error, the 'throw' will break out of the function.
-                    console.log(`${firstName} ${lastName}'s profile was created successfully!`);
+                    console.log(`${userInput.firstName} ${userInput.lastName}'s profile was created successfully!`);
                     // displays the table of employees.
                     viewEmployees(doneCreateEmployeeCallback);
                 });
@@ -264,7 +258,7 @@ removeRole = (doneRemoveRoleCallback) => {
     connection.query("SELECT * FROM role", function (err, res) {
         console.table(res);
     })
-    return inquirer.prompt(
+    inquirer.prompt(
         {
             name: "removeRole",
             type: "input",
@@ -287,7 +281,7 @@ removeEmployee = (doneRemoveEmployeeCallback) => {
     connection.query("SELECT * FROM employee", function (err, res) {
         console.table(res);
     })
-    return inquirer.prompt(
+    inquirer.prompt(
         {
             name: "removeEmployee",
             type: "input",
