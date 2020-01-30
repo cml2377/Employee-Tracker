@@ -190,64 +190,92 @@ createEmployee = (doneCreateEmployeeCallback) => {
     })
 };
 
-//===================================================
-// Add function to update employee. WHAT THE EFFFF
-//===================================================
-function updateEmployee(doneUpdateEmployeeCallback) {
+//========================================================
+// Add function to update employee role. WHAT THE EFFFF
+//========================================================
+function updateEmployeeRole(doneUpdateEmployeeRCallback) {
     // Must grab everything from employee table.
     connection.query("SELECT * FROM employee", function (err, res) {
         console.table(res);
         // Use the response to populate choices in prompt.
+        var idArray = [];
         var nameArray = [];
+        var roleArray = [];
         for (var i = 0; i < res.length; i++) {
+            idArray.push(res[i].id);
+            nameArray.push(res[i].firstName + " " + res[i].lastName);
+            roleArray.push(res[i].roleId);
+        }
+
+        console.log(idArray);
+
+        inquirer.prompt(
+            [
+                { // Select an employee, then select by column what you want to change. 
+                    name: "employeeId",
+                    type: "list",
+                    message: "Please select the id of the employee you want to update.",
+                    choices: idArray
+
+                },
+                {
+                    name: "employeeUpdateRole",
+                    type: "number",
+                    message: "Please update employee's role by selecting a new role ID.",
+                },
+
+            ]).then((userInput) => {
+                connection.query("UPDATE employee SET ? WHERE ?",
+                    [
+                        { roleId: userInput.employeeUpdateRole },
+                        { id: userInput.employeeId }
+                    ],
+                    viewEmployees(doneUpdateEmployeeRCallback));
+            })
+    })
+};
+
+//===================================================
+// Add function to update employee. WHAT THE EFFFF
+//===================================================
+function updateEmployeeManager(doneUpdateEmployeeMCallback) {
+    // Must grab everything from employee table.
+    connection.query("SELECT * FROM employee", function (err, res) {
+        console.table(res);
+        // Use the response to populate choices in prompt.
+        var idArray = [];
+        var nameArray = []
+        for (var i = 0; i < res.length; i++) {
+            idArray.push(res[i].id);
             nameArray.push(res[i].firstName + " " + res[i].lastName);
         }
+
+        console.log(nameArray, idArray);
 
         inquirer.prompt(
             [
                 { // Select an employee, then select by column what you want to change. 
                     name: "employeeList",
                     type: "list",
-                    message: "Please select the employee you want to update.",
-                    choices: nameArray
-                },
-                {
-                    name: "employeeStats",
-                    type: "list",
-                    message: "Please select which parameter you'd like to update.",
-                    choices: [
-                        "role ID",
-                        "manager"
-                    ]
-                },
-                {
-                    name: "employeeUpdateRole",
-                    type: "input",
-                    message: "Please update employee's role ID.",
-                    when: (userInput) => userInput.employeeStats === "role"
+                    message: "Please select the id of the employee you want to update.",
+                    choices: idArray
                 },
                 {
                     name: "employeeUpdateManager",
                     type: "list",
-                    message: "Please update employee's manager.",
-                    choices: nameArray,
-                    when: (userInput) => userInput.employeeStats === "manager"
+                    message: "Please update employee's manager by selecting the manager's employee ID.",
+                    choices: idArray,
                 }
 
             ]).then((userInput) => {
                 connection.query("UPDATE employee SET ? WHERE ?",
                     [
-                        {
-                            roleId: userInput.employeeUpdateRole
-                        },
-                        {
-                            // id equals employee chosen in employeeList.
-                        }
-                    ], doneUpdateEmployeeCallback);
+                        { managerId: userInput.employeeUpdateManager },
+                        { id: userInput.employeeList }
+                    ],
+                    viewEmployees(doneUpdateEmployeeMCallback));
             })
     })
-
-
 };
 
 //======================================
@@ -316,7 +344,8 @@ module.exports = {
     "createDept": createDept,
     "createRole": createRole,
     "createEmployee": createEmployee,
-    "updateEmployee": updateEmployee,
+    "updateEmployeeRole": updateEmployeeRole,
+    "updateEmployeeManager": updateEmployeeManager,
     "removeRole": removeRole,
     "removeEmployee": removeEmployee,
     "afterConnection": afterConnection

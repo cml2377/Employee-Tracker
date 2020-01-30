@@ -23,7 +23,8 @@ function NSAEmployeeTracker() {
                     "Add a department",
                     "Add a role",
                     "Add an employee",
-                    "Update employee information",
+                    "Update employee role",
+                    "Update employee's manager",
                     "Remove a role from database",
                     "Remove employee from database",
                     "Exit"]
@@ -73,8 +74,14 @@ function NSAEmployeeTracker() {
                     });
                     break;
                 //======================================================
-                case "Update employee information":
-                    manageDB.updateEmployee(function () {
+                case "Update employee role":
+                    manageDB.updateEmployeeRole(function () {
+                        NSAEmployeeTracker();
+                    });
+                    break;
+                //======================================================
+                case "Update employee's manager":
+                    manageDB.updateEmployeeManager(function () {
                         NSAEmployeeTracker();
                     });
                     break;
