@@ -1,10 +1,11 @@
 //===================================================================
-//   There are definitely better software options than this below.
+//   There are definitely better software options than this below. //
 //===================================================================
 
 var mysql = require("mysql");
 require("dotenv").config();
-const consoleTable = require('console.table');
+// const consoleTable = require('console.table');
+const inquirer = require("inquirer");
 
 var connection = mysql.createConnection({
     host: "localhost",
@@ -72,7 +73,9 @@ viewEmployees = (doneViewEmployeeCallback) => {
     })
 };
 
+//===========================================================
 // Add function to create department
+//===========================================================
 createDept = (doneCreateDeptCallback) => {
     console.log("Creating a new department...\n")
     inquirer.prompt([
@@ -80,16 +83,10 @@ createDept = (doneCreateDeptCallback) => {
             name: "departmentName",
             type: "input",
             message: "What is the department name?"
-        },
-        {
-            name: "departmentId",
-            type: "input",
-            message: "What is the department Id?"
         }
     ]).then(function (userInput) {
         connection.query("INSERT INTO department SET ?",
             {
-                id: userInput.departmentid,
                 deptName: userInput.departmentName,
             },
             function (err) {
@@ -97,12 +94,13 @@ createDept = (doneCreateDeptCallback) => {
                 // Don't need an else here because if there's an error, the 'throw' will break out of the function.
                 console.log(`Department ${userInput.departmentName} was created successfully!`);
                 // Displays table of departments.
-                viewDept();
-                doneCreateDeptCallback();
+                // This is NESTED SO MUCH
+                viewDept(doneCreateDeptCallback);
             });
     })
 
 };
+
 // Add function to create role
 createRole = (doneCreateRoleCallback) => {
     console.log("Creating a new role...")
@@ -142,101 +140,125 @@ createRole = (doneCreateRoleCallback) => {
                 // Don't need an else here because if there's an error, the 'throw' will break out of the function.
                 console.log(`Role ${userInput.roleTitle} was created successfully!`);
                 // displays table of roles
-                viewRoles();
-                doneCreateRoleCallback();
-            });
-    })
-};
-// Add function to create employee
-createEmployee = (doneCreateEmployeeCallback) => {
-    console.log("Creating new employee data...")
-    inquirer.prompt([
-        {
-            name: "firstName",
-            type: "input",
-            message: "What is the employee's first name?"
-        },
-        {
-            name: "lastName",
-            type: "input",
-            message: "What is the employee's last name?"
-        },
-        {
-            name: "roleId",
-            type: "input",
-            message: "Which role does this employee belong to?"
-        },
-        {
-            name: "managerList",
-            type: "list",
-            message: "Does this employee have a manager? If so, select their manager. If there is no manager, select None (NULL).",
-            choices: [employeeList = () => {
-                var managerArray = []; // This will return all employees... Technically all managers are employees. Might pare it down by WHEN managerId= NULL.
-                for (var i = 0; i < res.length; i++) {
-                    managerArray.push(res[i].firstName + " " + res[i].lastName);
-                }
-                return managerArray;
-            }, "None"]
-        }
-    ]).then(function (userInput) {
-        connection.query("INSERT INTO role SET ?",
-            {
-                firstName: userInput.firstName,
-                lastName: userInput.lastName,
-                roleId: userInput.roleId,
-                // managerId: if true, an employeeId. if false, null.
-            },
-            function (err) {
-                // no throw, return error?
-                if (err) throw err;
-                // Don't need an else here because if there's an error, the 'throw' will break out of the function.
-                console.log(`${firstName} ${lastName}'s profile was created successfully!`);
-                // displays the table of employees.
-                viewEmployees();
-                doneCreateEmployeeCallback();
+                viewRoles(doneCreateRoleCallback);
             });
     })
 };
 
-// Add function to update employee
-function updateEmployee(err, res) {
+// Add function to create employee
+// I deserve this pain for doing callbacks. FML
+createEmployee = (doneCreateEmployeeCallback) => {
+    console.log("Creating new employee data...")
+    connection.query("SELECT * FROM employee", function (err, res) {
+        var managerArray = ["None"]; // This will return all employees... Technically all managers are employees.
+        for (var i = 0; i < res.length; i++) {
+            managerArray.push(res[i].firstName + " " + res[i].lastName);
+        }
+        inquirer.prompt([
+            {
+                name: "firstName",
+                type: "input",
+                message: "What is the employee's first name?"
+            },
+            {
+                name: "lastName",
+                type: "input",
+                message: "What is the employee's last name?"
+            },
+            {
+                name: "roleId",
+                type: "input",
+                message: "Which role does this employee belong to?"
+            },
+            {
+                name: "managerList",
+                type: "list",
+                message: "Does this employee have a manager? If so, select their manager. If there is no manager, select None (NULL).",
+                choices: managerArray
+            }
+        ]).then(function (userInput) {
+            connection.query("INSERT INTO role SET ?",
+                {
+                    firstName: userInput.firstName,
+                    lastName: userInput.lastName,
+                    roleId: userInput.roleId,
+                    // managerId: if true, an employeeId. if false, null.
+                },
+                function (err) {
+                    // no throw, return error?
+                    if (err) throw err;
+                    // Don't need an else here because if there's an error, the 'throw' will break out of the function.
+                    console.log(`${firstName} ${lastName}'s profile was created successfully!`);
+                    // displays the table of employees.
+                    viewEmployees(doneCreateEmployeeCallback);
+                });
+        })
+    })
+};
+
+//===================================================
+// Add function to update employee. WHAT THE EFFFF
+//===================================================
+function updateEmployee(doneUpdateEmployeeCallback) {
     // Must grab everything from employee table.
     connection.query("SELECT * FROM employee", function (err, res) {
         console.table(res);
-    })
-    return inquirer.prompt(
-        [
-            { // Select an employee, then select by column what you want to change. 
-                name: "employeeList",
-                type: "list",
-                message: "Please select the employee you want to update.",
-                choices: [
-                    employeeList = () => {
-                        var nameArray = [];
-                        for (var i = 0; i < res.length; i++) {
-                            nameArray.push(res[i].firstName + " " + res[i].lastName);
+        // Use the response to populate choices in prompt.
+        var nameArray = [];
+        for (var i = 0; i < res.length; i++) {
+            nameArray.push(res[i].firstName + " " + res[i].lastName);
+        }
+
+        inquirer.prompt(
+            [
+                { // Select an employee, then select by column what you want to change. 
+                    name: "employeeList",
+                    type: "list",
+                    message: "Please select the employee you want to update.",
+                    choices: nameArray
+                },
+                {
+                    name: "employeeStats",
+                    type: "list",
+                    message: "Please select which parameter you'd like to update.",
+                    choices: [
+                        "role ID",
+                        "manager"
+                    ]
+                },
+                {
+                    name: "employeeUpdateRole",
+                    type: "input",
+                    message: "Please update employee's role ID.",
+                    when: (userInput) => userInput.employeeStats === "role"
+                },
+                {
+                    name: "employeeUpdateManager",
+                    type: "list",
+                    message: "Please update employee's manager.",
+                    choices: nameArray,
+                    when: (userInput) => userInput.employeeStats === "manager"
+                }
+
+            ]).then((userInput) => {
+                connection.query("UPDATE employee SET ? WHERE ?",
+                    [
+                        {
+                            roleId: userInput.employeeUpdateRole
+                        },
+                        {
+                            // id equals employee chosen in employeeList.
                         }
-                        return nameArray;
-                    },
-                ]
-            },
-            {
-                name: "employeeStats",
-                type: "list",
-                message: "Please select which parameter you'd like to update.",
-                choices: [
+                    ], doneUpdateEmployeeCallback);
+            })
+    })
 
-                ]
-            }
-        ]).then(() => {
-            connection.query({
-
-            });
-        })
 
 };
 
+//======================================
 // Add function to delete role
+//======================================
 removeRole = (doneRemoveRoleCallback) => {
     // Displays table of roles to reference when deleting roles.
     connection.query("SELECT * FROM role", function (err, res) {
@@ -247,15 +269,13 @@ removeRole = (doneRemoveRoleCallback) => {
             name: "removeRole",
             type: "input",
             message: "To remove a role from the database, please input the role ID.",
-
         })
         .then(function (res) {
             var newId = Number(res.removeRole);
             connection.query("DELETE FROM role WHERE ?", { id: newId }, function (err, res) {
                 console.log("Role has been purged from the database.");
                 // Displays table of roles.
-                viewRoles();
-                doneRemoveRoleCallback();
+                viewRoles(doneRemoveRoleCallback);
             });
         })
 };
@@ -279,13 +299,12 @@ removeEmployee = (doneRemoveEmployeeCallback) => {
             connection.query("DELETE FROM employee WHERE ?", { id: newId }, function (err, res) {
                 console.log("Employee has been purged from the database.");
                 // Displays table of employees.
-                viewEmployees();
-                doneRemoveEmployeeCallback();
+                viewEmployees(doneRemoveEmployeeCallback);
             });
         })
 };
 
-
+//====================MAKE=IT=STOP=========================//
 afterConnection = () => {
     // Closes connection after the query has finished.
     connection.end();
