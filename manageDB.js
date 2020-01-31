@@ -49,7 +49,9 @@ viewDept = (doneViewDeptCallback) => {
 // View roles
 viewRoles = (doneViewRolesCallback) => {
     console.log("Loading all roles...\n");
-    connection.query("SELECT * FROM role", function (err, res) {
+    connection.query(`SELECT * FROM role
+    INNER JOIN 
+    department ON role.departmentId = department.id`, function (err, res) {
         if (err) {
             console.error(err)
         } else {
@@ -60,10 +62,22 @@ viewRoles = (doneViewRolesCallback) => {
     )
 };
 
+/* Reference from W3Schools
+SELECT column_name(s)
+FROM table1
+INNER JOIN table2
+ON table1.column_name = table2.column_name;
+*/
+
 // View employee list
 viewEmployees = (doneViewEmployeeCallback) => {
     console.log("Loading all employees...\n");
-    connection.query("SELECT * FROM employee", function (err, res) {
+    connection.query(`SELECT * FROM employee
+      INNER JOIN	
+    role ON employee.roleId = role.id
+    INNER JOIN
+    department ON role.departmentId = department.id
+    `, function (err, res) {
         if (err) {
             console.error(err);
         } else {

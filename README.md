@@ -28,6 +28,10 @@ node index.js
 
 ![Demonstration of Employee Tracker as a gif](https://github.com/cml2377/Employee-Tracker/blob/master/demo.gif)
 
+## Screenshot of Employee Table
+
+![Screenshot of CLI App](https://github.com/cml2377/Employee-Tracker/blob/master/Screenshot_1.png)
+
 ### Acknowledgements
 
 Thanks to [Brianna McCray](https://github.com/bwmccray) for help with my update and delete functions!
