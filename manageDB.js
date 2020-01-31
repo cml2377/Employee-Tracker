@@ -177,7 +177,6 @@ createEmployee = (doneCreateEmployeeCallback) => {
                 function (err, res) {
                     console.log('error:' + err);
                     console.log(`${userInput.firstName} ${userInput.lastName}'s profile was created successfully!`);
-                    console.log(res);
                     // displays the table of employees.
                     viewEmployees(doneCreateEmployeeCallback);
                 });
@@ -214,7 +213,6 @@ function updateEmployeeRole(doneUpdateEmployeeRCallback) {
                         { id: userInput.employeeId }
                     ], function (err, res) {
                         console.log('error:' + err);
-                        console.log(res);
                         viewEmployees(doneUpdateEmployeeRCallback)
                     });
             })
@@ -250,7 +248,6 @@ function updateEmployeeManager(doneUpdateEmployeeMCallback) {
                     ], function (err, res) {
                         console.log('error:' + err);
                         console.log(`Employee's manager was updated successfully!`);
-                        console.log(res);
                         viewEmployees(doneUpdateEmployeeMCallback)
                     }
                 );
